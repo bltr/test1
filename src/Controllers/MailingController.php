@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Db\MailingLogs;
 use App\Db\Users;
 use App\Exceptions\ValidationException;
+use App\Libs\MailingQueue\DriverType;
 use App\Libs\MailingQueue\EmailQueue;
 use App\Libs\MailingQueue\MailingQueue;
 use App\Libs\MailingQueue\TelegramQueue;
@@ -24,15 +25,7 @@ class MailingController
 
     public function send(array $data): array
     {
-        if (empty($data['driver'])) {
-            throw new ValidationException('Driver is required');
-        }
-        if (empty($data['subject'])) {
-            throw new ValidationException('Subject is required');
-        }
-        if (empty($data['message'])) {
-            throw new ValidationException('Message is required');
-        }
+        $this->validate($data);
 
         ['driver' => $driver, 'subject' => $subject, 'message' => $message] = $data;
 
@@ -45,10 +38,8 @@ class MailingController
             $mailing_queue->push($user['name'], $subject, $message);
             $this->mailing_logs->insert($driver, $user['id'], $subject, $message);
 
-            // для имитации неожиданного прерывания через 2 сек
-            //if (time() - $time > 2) {
-            //    die;
-            //}
+            // для имитации неожиданного прерывания через 1 сек
+            //if (time() - $time > 1) die;
         }
 
         return ['success' => true];
@@ -57,8 +48,27 @@ class MailingController
     public function getMailingQueue(string $driver): MailingQueue
     {
         return match ($driver) {
-            'email' => new EmailQueue(),
-            'telegram' => new TelegramQueue(),
+            DriverType::EMAIL->value => new EmailQueue(),
+            DriverType::TELEGRAM->value => new TelegramQueue(),
         };
+    }
+
+    public function validate(array $data)
+    {
+        if (empty($data['driver'])) {
+            throw new ValidationException('Driver is required');
+        }
+
+        if (empty($data['subject'])) {
+            throw new ValidationException('Subject is required');
+        }
+
+        if (empty($data['message'])) {
+            throw new ValidationException('Message is required');
+        }
+
+        if (!in_array($data['driver'], DriverType::values())) {
+            throw new ValidationException('Driver is not valid');
+        }
     }
 }
