@@ -2,3 +2,5 @@
 /.idea/
 /vendor/
 /.php-cs-fixer.cache
+/telegram.log
+/email.log

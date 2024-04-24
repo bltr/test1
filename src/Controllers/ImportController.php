@@ -21,7 +21,7 @@ class ImportController
     public function import(array $file): array
     {
         if (empty($file['data'])) {
-            throw new ValidationException('File required');
+            throw new ValidationException('File is required');
         }
 
         $iterator = new CsvFileIteratorAggregate($file['data']['tmp_name']);

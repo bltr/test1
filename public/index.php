@@ -20,7 +20,8 @@ try {
     }
 
     if ($method === 'POST' && $uri === '/api/users/mailing') {
-        $res = (new MailingController())->send();
+        $data = json_decode(file_get_contents('php://input'), true);
+        $res = (new MailingController())->send($data);
 
         header('Content-Type: application/json');
         echo json_encode($res);
