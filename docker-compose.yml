@@ -8,6 +8,10 @@ services:
     volumes:
       - .:/app
       - composer:/composer
+    environment:
+      DB_PASSWORD: $DB_PASSWORD
+      DB_USER: $DB_USERNAME
+      DB_NAME: $DB_DATABASE
     depends_on:
       - db
 
