@@ -15,7 +15,7 @@ class TelegramQueue implements MailingQueue
 
     public function push(string $user_name, string $subject, string $message): void
     {
-        // пишием в файл для имитации отправки
+        // пишем в файл для имитации отправки
         fwrite($this->file, $user_name . "\n");
     }
 }
